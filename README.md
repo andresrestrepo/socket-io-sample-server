@@ -6,7 +6,7 @@ Python Flask App to manage simple socket IO sample
 
 pipenv install<br>
 pipenv shell<br>
-python api.py<br>
+python app.py<br>
 
 ## Site Instructions
 
