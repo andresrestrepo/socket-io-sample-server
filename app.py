@@ -1,23 +1,20 @@
 #!/usr/bin/env python
 from threading import Lock
-from flask import Flask, render_template, session, request, \
-    copy_current_request_context
-from flask_socketio import SocketIO, emit, join_room, leave_room, \
-    close_room, rooms, disconnect
+from flask import Flask, session
+from flask_socketio import SocketIO, emit
 
 
 async_mode = None
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app, async_mode=async_mode)
+app.config['SECRET_KEY'] = 'secreto'
+socketio = SocketIO(app, async_mode=async_mode, cors_allowed_origins="*")
 thread = None
 thread_lock = Lock()
 
 
 def background_thread():
-    """Example of how to send server generated events to clients."""
-    count = 0
+    count = 1
     while True:
         socketio.sleep(10)
         count += 1
@@ -25,12 +22,7 @@ def background_thread():
                       {'data': 'Server generated event', 'count': count})
 
 
-@app.route('/')
-def index():
-    return render_template('index.html', async_mode=socketio.async_mode)
-
-
-@socketio.on('my_event', )
+@socketio.on('my_event')
 def test_message(message):
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('my_response',
@@ -44,7 +36,6 @@ def test_connect():
         if thread is None:
             thread = socketio.start_background_task(background_thread)
     emit('my_response', {'data': 'Connected', 'count': 0})
-
 
 
 if __name__ == '__main__':
